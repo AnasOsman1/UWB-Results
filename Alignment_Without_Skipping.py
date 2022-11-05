@@ -5,6 +5,7 @@ import numpy as np
 import math
 import time
 
+#TODO Currently missing the part where we add points 
 # Script for Fixing the UWb and analyzing the missing data
 counter = 0
 data_dir = "/Users/anasosman/Downloads/Terrece_Experiment/Experiment_Terrace"
