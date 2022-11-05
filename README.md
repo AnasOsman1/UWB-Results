@@ -35,3 +35,9 @@ To run this script it requies the directory that include the UWB_Cad data or the
 Includes the performance of index offset analysis in-order to assis if there is a sampling gap between the GPS/Cohda and UWB while the car is moving at diffrent speeds.
 
 To run this it requires the UWB directory path andpath of the directory of the GPS.
+
+## Alignment_Without_Skipping.
+
+A script used to analyze the raw UWB data fix the sampling issues with the timestamps and perform a proper time alignment with Cohda/GPS.
+
+In case of missing data the script accounts for it in the form of averaging the two closest values.
