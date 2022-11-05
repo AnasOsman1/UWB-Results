@@ -7,6 +7,8 @@ import pandas as pd
 import os
 import glob
 import shutil
+
+# Globals
 # Terrace Refrance Points
 Lat1 = 46.0677393
 Lon1 = 11.15091824
@@ -26,7 +28,6 @@ Lon3 = 11.15160491
 '''
 
 # Hervestine Distance between Lat1/ Lon1 to Lat2/Lon2
-
 
 def dis_calc_herv(Lat1, Lon1, Lat2=[], Lon2=[]):
     earthR = 6356.137  # in Km
@@ -62,8 +63,7 @@ def xy_distance(x1, y1, x=[], y=[]):
 
 def Tri_conv(r1, r2, r3, Time):
 
-    # Refracance CAD Points
-
+    # UWB Refracance CAD Points
     x1 = 100.23
     y1 = 50.84
     x2 = 113.47
@@ -96,13 +96,12 @@ def Tri_conv(r1, r2, r3, Time):
         'z': 0  # for cad conversion
     }
     l = pd.DataFrame(new)
-    # for Autocad Script covnversion
+    # for AutoCAD Script Covnversion
     symp = ','
     l['AutoCAD Format'] = l['x'].astype(
         str)+","+l['y'].astype(str)+","+l['z'].astype(str)
     l.index = numpy.arange(1, len(l.x)+1)
     return(l)
-
 
 # Conversion to CAD XY
 def Conversion(File_Path, type):
@@ -137,6 +136,7 @@ def Conversion(File_Path, type):
             n = i[:i.rfind('.csv')]
             # read the csv file
             if(type == "UWB"):
+                # Imposing the Device Offset 0.09cm
                 os.system(
                     "/Library/Frameworks/R.framework/Versions/4.0/Resources/Rscript"+" "+"/Users/anasosman/Downloads/offset.r"+" " + i+" " + n+"_offset.csv")
                 data = pd.read_csv(n+"_offset.csv")
@@ -164,13 +164,6 @@ def Conversion(File_Path, type):
                 i = i[:i.rfind('.csv')]
                 GPS.to_csv(i+"_cad.csv")
                 shutil.move(i+"_cad.csv", path2)
-                '''
-                with open(i+"_cad.scr", "w") as f_out:  # Autocad script file creation
-                    content = "\n".join(UWB['combined'])
-                    new_line = "_MULTIPLE _POINT\n"
-                    f_out.write(new_line + content)
-                    shutil.move(i+"_cad.scr", path3)
-                 '''
 
 
 # Function Invoked when Given Path and type of Conversion
