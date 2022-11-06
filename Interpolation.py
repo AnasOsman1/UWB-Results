@@ -9,7 +9,7 @@ import shutil
 def interpol(data):
     new1 = pd.DataFrame()
     print(len(data.x))
-    print(data.x[0])
+    print(data.x[0])   # [x1 12345678910 x2][x2     x3]
     for i in range(1, len(data.x), 1):
         if i < len(data.x)-1:
             nn = np.linspace(data.x[i], data.x[i+1], num=12)
@@ -36,26 +36,30 @@ def interpol(data):
     return(new1)
 
 
-def cast(File_Path, typ):
-    path = File_Path
-    directory = typ+"_trial_test"
-    path2 = os.path.join(path, directory)
-
+def cast(data_dir, typ, sub_folders):
+    directory = typ+"_Interpolated_test"
+    for i in range(0, len(sub_folders), 1):
+        path = os.path.join(data_dir, sub_folders[i])
+        path2 = os.path.join(path, directory)
+        os.chdir(path)
     # overwrite if already exists
-    if os.path.exists(path2):
-        print("Path already exists' Override!")
-        shutil.rmtree(path2)
-    os.mkdir(path2)
-    csv_files = glob.glob(os.path.join(path, "*.csv"))
-    print(csv_files)
-    for file in csv_files:
-        a = interpol(pd.read_csv(file))
-        file = file[:file.rfind('.csv')]
-        a.to_csv(file+"_trial.csv")
-        shutil.move(file+"_trial.csv", path2)
+        if os.path.exists(path2):
+            print("Path already exists' Override!")
+            shutil.rmtree(path2)
+        os.mkdir(path2)
+        csv_files = glob.glob(os.path.join(path, "*.csv"))
+        print(csv_files)
+        for i in csv_files:
+            a = interpol(pd.read_csv(i))
+            i = i[:i.rfind('.csv')]
+            a.to_csv(i+"_Interpolated.csv")
+            shutil.move(i+"_Interpolated.csv", path2)
 
     print("\n End of trial, No Errors!")
 
 
-File_Path = "/Users/anasosman/Downloads/ExperimentOutside/random/GPS/GPS_CAD"
-cast(File_Path, "GPS")
+data_dir = "/Users/anasosman/Downloads/GPS_Aligned2"
+sub_folders = os.listdir(data_dir)
+sub_folders.remove(".DS_Store")
+print(sub_folders)
+cast(data_dir, "GPS", sub_folders)
