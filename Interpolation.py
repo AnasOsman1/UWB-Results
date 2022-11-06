@@ -10,7 +10,7 @@ def interpol(data):
     new1 = pd.DataFrame()
     print(len(data.x))
     print(data.x[0])   # [x1 12345678910 x2][x2     x3]
-    for i in range(1, len(data.x), 1):
+    for i in range(0, len(data.x), 1):
         if i < len(data.x)-1:
             nn = np.linspace(data.x[i], data.x[i+1], num=12)
             ss = np.linspace(data.y[i], data.y[i+1], num=12)
@@ -58,7 +58,7 @@ def cast(data_dir, typ, sub_folders):
     print("\n End of trial, No Errors!")
 
 
-data_dir = "/Users/anasosman/Downloads/GPS_Aligned2"
+data_dir = "/Users/anasosman/Downloads/Terrece_Experiment/GPS_Terrace"
 sub_folders = os.listdir(data_dir)
 sub_folders.remove(".DS_Store")
 print(sub_folders)
