@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.
 import pandas as pd
 import os
 import glob
@@ -8,16 +9,12 @@ import shutil
 
 # Script for Fixing the UWb and analyzing the missing data
 # data_dir = "/Users/anasosman/Downloads/2022.10.14_2_terrace_afternoon"  # Garage
-data_dir = "/Users/anasosman/Downloads/Experiment_Garage"
+data_dir = "/Users/anasosman/Downloads/test2"
 sub_folders = os.listdir(data_dir)
+sub_folders.remove('.DS_Store')
 directory = "GPS_Aligned"
 directory3 = "UWB_Modified"
 path2 = os.path.join(data_dir, directory3)
-
-# overwrite if already exists
-if os.path.exists(path2):
-    shutil.rmtree(path2)
-os.mkdir(path2)
 
 a = pd.DataFrame()
 b = pd.DataFrame()
@@ -80,14 +77,37 @@ def align(s):
 
 
 def time_alignment(b, z):
-    y = pd.DataFrame()
-    for j in range(1, len(b), 1):
-        for k in range(0, len(z.time_stamps), 1):
-            if z.time_stamps[k] == b.time_stamps[j]:
-                x = pd.DataFrame(
-                    {"time_stamps": b.time_stamps[j], "x": b.x[j], "y": b.y[j]}, [k])
-                y = pd.concat([y, x])
+
+    m = b.time_stamps.isin(z.time_stamps)
+    df2 = b[m]
+    y = pd.DataFrame(
+        {"time_stamps": df2.time_stamps, "x": df2.x, "y": df2.y})
+    y.reset_index(drop=True, inplace=True)
+    #y.drop('Unnamed: 0', axis=1, inplace=True)
+#    for j in range(1, len(b), 1):
+#        for k in range(0, len(z.time_stamps), 1):
+#            if z.time_stamps[k] == b.time_stamps[j]:
+#                x = pd.DataFrame(
+#                    {"time_stamps": b.time_stamps[j], "x": b.x[j], "y": b.y[j]}, [k])
+#                y = pd.concat([y, x])
     return y
+
+    #list = b[b['time_stamps'] == z['time_stamps']]
+    # print(list)
+   # y = pd.DataFrame(
+   #     {"time_stamps": list.time_stamps, "x": list.x, "y": list.y})
+   # y.reset_index(drop=True, inplace=True)
+    # print(list)
+  #  for j in list:
+  #      x = pd.DataFrame(
+  #          {"time_stamps": b.time_stamps[j], "x": b.x[j], "y": b.y[j]}, [k])
+  #      y = pd.concat([y, x])
+  #  for j in range(0, len(b), 1):
+  #      for k in range(0, len(z.time_stamps), 1):
+  #          if z.time_stamps[k] == b.time_stamps[j]:
+  #              x = pd.DataFrame(
+  #                  {"time_stamps": b.time_stamps[j], "x": b.x[j], "y": b.y[j]}, [k])
+  #              y = pd.concat([y, x])
 
 
 #### WHERE I MODIFIED THE CODE!!! ####
@@ -113,7 +133,7 @@ def insertMissingPoints(z, k, diff):
     return rows
 
 
-for i in range(1, len(sub_folders), 1):
+for i in range(0, len(sub_folders), 1):
     path = os.path.join(data_dir, sub_folders[i])
     os.chdir(path)
     path2 = os.path.join(path, directory3)
@@ -127,16 +147,20 @@ for i in range(1, len(sub_folders), 1):
     csv_files = glob.glob(os.path.join(path, "*.csv"))
     for i in csv_files:
         print(i)
-        df = pd.DataFrame()
-        cols = ["rosbagTimestamp", "x", "y"]
+        cols = ["time_stamps", "x", "y"]
         UWB = pd.read_csv(i, usecols=cols)
         cols2 = ["time_stamps", "x", "y"]
         GPS = pd.read_csv(
             "/Users/anasosman/Downloads/2022.10.14_2_terrace_afternoon/GPS/novatel_cad.csv")
         a = UWB.reset_index()
         b = GPS
-        a['time_stamps'] = (UWB.rosbagTimestamp/10**8)
+        a['time_stamps'] = (UWB.time_stamps/10**8)  # for UWB x10^8
+        #a['time_stamps'] = (UWB.time_stamps/10**5)
+        a.reset_index(drop=True, inplace=True)
+        # for Cohda x10^12
         b['time_stamps'] = (GPS.time_stamps/100).astype(int)
+        # b['time_stamps'] = (GPS.time_stamps/10 **5).astype(int)  # for Cohda x10^15
+        b.reset_index(drop=True, inplace=True)
         s = a.round(2)
         # z = align(b) # for GPS missing values
         z = align(s)  # for UWB missing values
@@ -171,6 +195,7 @@ for i in range(1, len(sub_folders), 1):
         shutil.move(i+"_modification.csv", path2)
         print("Lenght Diffrances: ", len(new_uwb.x) - len(UWB.x))
         l = time_alignment(b, new_uwb)
+        # print(l)
         i[:i.rfind('.csv')]
         l.to_csv(i+"_gps.csv")
         shutil.move(i+"_gps.csv", path3)
