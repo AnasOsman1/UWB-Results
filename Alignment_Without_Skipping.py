@@ -75,6 +75,8 @@ def align(s):
 
 # GPS/COHDA time alignment with UWB
 
+########################## Where I changed Start ########################
+
 
 def time_alignment(b, z):
 
@@ -91,6 +93,7 @@ def time_alignment(b, z):
 #                    {"time_stamps": b.time_stamps[j], "x": b.x[j], "y": b.y[j]}, [k])
 #                y = pd.concat([y, x])
     return y
+########################## Where I changed End ########################
 
     #list = b[b['time_stamps'] == z['time_stamps']]
     # print(list)
@@ -154,12 +157,17 @@ for i in range(0, len(sub_folders), 1):
             "/Users/anasosman/Downloads/2022.10.14_2_terrace_afternoon/GPS/novatel_cad.csv")
         a = UWB.reset_index()
         b = GPS
-        a['time_stamps'] = (UWB.time_stamps/10**8)  # for UWB x10^8
+        # For Cohda vs GPS Case
         #a['time_stamps'] = (UWB.time_stamps/10**5)
-        a.reset_index(drop=True, inplace=True)
-        # for Cohda x10^12
+        #b['time_stamps'] = (GPS.time_stamps/100).astype(int)
+        # for UWB vs GPS Case
+        a['time_stamps'] = (UWB.time_stamps/10**8)  # for UWB x10^8
         b['time_stamps'] = (GPS.time_stamps/100).astype(int)
+        # for UWB vs Cohda Case
+        #a['time_stamps'] = (UWB.time_stamps/10**8)
         # b['time_stamps'] = (GPS.time_stamps/10 **5).astype(int)  # for Cohda x10^15
+        # rearrage
+        a.reset_index(drop=True, inplace=True)
         b.reset_index(drop=True, inplace=True)
         s = a.round(2)
         # z = align(b) # for GPS missing values
